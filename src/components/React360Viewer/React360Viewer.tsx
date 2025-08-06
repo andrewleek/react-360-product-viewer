@@ -23,6 +23,8 @@ export interface React360ViewerProps {
   reverse?: boolean;
   autoplay?: boolean;
   autoplayTarget?: number;
+  autoplayLoop?: boolean;
+  stopAutoplayOnInteraction?: boolean;
   width?: number;
   height?: number;
   zeroPad?: ZeroPadRange;
@@ -70,6 +72,8 @@ export const React360Viewer = ({
   autoplaySpeed = 10,
   autoplay = false,
   autoplayTarget,
+  autoplayLoop = true,
+  stopAutoplayOnInteraction = true,
   width = 150,
   height = 150,
   zeroPad = 0,
@@ -95,7 +99,9 @@ export const React360Viewer = ({
   const [showRotationIcon, setShowRotationIcon] = useState(
     showRotationIconOnStartup
   );
+
   const [useAutoplay, setUseAutoplay] = useState(autoplay);
+
   useEffect(() => {
     setUseAutoplay(autoplay);
 
@@ -132,7 +138,7 @@ export const React360Viewer = ({
 
     setSelectedImageIndex(index);
 
-    if (autoplayTarget !== undefined && index === autoplayTarget) {
+    if (autoplayTarget !== undefined && index === autoplayTarget && !autoplayLoop) {
       setUseAutoplay(false);
     }
   };
@@ -191,6 +197,9 @@ export const React360Viewer = ({
 
   const onMouseUp = (e?: React.MouseEvent) => {
     setIsScrolling(false);
+
+    if(autoplay && !stopAutoplayOnInteraction)
+      setUseAutoplay(true);
 
     if (!shouldNotifyEvents) return;
 
