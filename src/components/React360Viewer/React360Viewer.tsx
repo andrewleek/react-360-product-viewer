@@ -21,6 +21,7 @@ export interface React360ViewerProps {
   mouseDragSpeed?: number;
   autoplaySpeed?: number;
   reverse?: boolean;
+  inertia?: boolean;
   autoplay?: boolean;
   autoplayTarget?: number;
   autoplayLoop?: boolean;
@@ -69,6 +70,7 @@ export const React360Viewer = ({
   imageFilenamePrefix,
   mouseDragSpeed = 20,
   reverse = false,
+  inertia = false,
   autoplaySpeed = 10,
   autoplay = false,
   autoplayTarget,
@@ -95,6 +97,10 @@ export const React360Viewer = ({
   const [imageSources, setImageSources] = useState<
     Array<{ src: string; index: string }>
   >([]);
+
+  const currentMousePositionRef = useRef<number>(0);
+  const targetMousePositionRef = useRef<number>(0);
+  const rafRef = useRef<number>(0);
 
   const [showRotationIcon, setShowRotationIcon] = useState(
     showRotationIconOnStartup
@@ -179,6 +185,10 @@ export const React360Viewer = ({
   const onMouseDown = (e: React.MouseEvent) => {
     setInitialMousePosition(e.clientX);
     setCurrentMousePosition(e.clientX);
+
+    currentMousePositionRef.current = e.clientX;
+    targetMousePositionRef.current = e.clientX;
+
     setStartingImageIndexOnPointerDown(selectedImageIndex);
     setUseAutoplay(false);
     setIsScrolling(true);
@@ -212,7 +222,10 @@ export const React360Viewer = ({
   const onMouseMove = (e: React.MouseEvent) => {
     if (!isScrolling) return;
 
-    setCurrentMousePosition(e.clientX);
+    targetMousePositionRef.current = e.clientX;
+
+    if(!inertia)
+      setCurrentMousePosition(e.clientX);
 
     if (shouldNotifyEvents) notifyOnPointerMoved?.(e.clientX, e.clientY);
   };
@@ -225,8 +238,6 @@ export const React360Viewer = ({
       );
       setSelectedImageIndex(index);
     };
-
-    if (!isScrolling) return;
 
     // Aim is to get a speedfactor that can be easily adjusted from a user perspective
     // as well as proportionate to the size of the image.
@@ -249,6 +260,32 @@ export const React360Viewer = ({
     height,
     reverse,
   ]);
+
+  const lerp = (start:number, end:number, t:number) => {
+    return start + (end - start) * t;
+  }
+
+  const lerpRotation = () => {
+
+    const offset = Math.abs(targetMousePositionRef.current - currentMousePositionRef.current);
+
+    if(offset > 1.0)
+    {
+      currentMousePositionRef.current = lerp(currentMousePositionRef.current, targetMousePositionRef.current, 0.04);
+      setCurrentMousePosition(currentMousePositionRef.current)
+    }
+
+    rafRef.current = requestAnimationFrame(lerpRotation);
+  };
+
+  useEffect(() => {
+
+    if(inertia)
+      rafRef.current = requestAnimationFrame(lerpRotation);
+
+    return () => cancelAnimationFrame(rafRef.current);
+
+  }, [inertia]);
 
   return (
     <StyledDiv
