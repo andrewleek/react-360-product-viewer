@@ -35,6 +35,8 @@ export interface React360ViewerProps {
   notifyOnPointerUp?: (x: number, y: number) => void;
   notifyOnPointerMoved?: (x: number, y: number) => void;
   shouldNotifyEvents?: boolean;
+  className?: string;
+  imagePosition?: string;
 }
 
 /** Base props *and* all available HTML div element props. */
@@ -48,7 +50,8 @@ interface StyleProps {
 const StyledDiv = styled.div<StyleProps>`
   position: relative;
   border: none;
-  padding: 5px;
+  width: 100%;
+  height: 100%;
   display: inline-block;
   user-select: none;
   touch-action: none;
@@ -86,6 +89,8 @@ export const React360Viewer = ({
   notifyOnPointerDown,
   notifyOnPointerUp,
   notifyOnPointerMoved,
+  className = '',
+  imagePosition,
 }: React360ViewerPropsExtended) => {
   const elementRef = useRef(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -296,6 +301,7 @@ export const React360Viewer = ({
       onPointerMove={onMouseMove}
     // onMouseDown={onMouseDown}
     // onMouseMove={onMouseMove}
+      className={className}
     >
       {showRotationIcon ? (
         <>
@@ -311,10 +317,9 @@ export const React360Viewer = ({
       {imageSources.map((s, index) => (
         <AnimationImage
           src={s.src}
-          width={width}
-          height={height}
           isVisible={index === selectedImageIndex}
           key={index}
+          imagePosition={imagePosition}
         ></AnimationImage>
       ))}
     </StyledDiv>

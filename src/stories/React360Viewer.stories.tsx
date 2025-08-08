@@ -25,6 +25,8 @@ const Template: StoryFn<typeof React360Viewer> = (
         border: "1px solid red",
         borderRadius: "5px",
         boxShadow: "5px 5px 5px grey",
+        width: "200px",
+        height: "300px"
       }}
     >
       <React360Viewer {...args} />{" "}
