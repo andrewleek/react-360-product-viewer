@@ -6,6 +6,7 @@ type StyledRotateIconProps = {
   isReverse: boolean;
 };
 
+
 const StyledRotateIcon = styled(RotateIcon)<StyledRotateIconProps>`
   position: absolute;
 
@@ -15,7 +16,7 @@ const StyledRotateIcon = styled(RotateIcon)<StyledRotateIconProps>`
   opacity: 0.8;
   ${(props) =>
     css`
-      top: calc(50% -${(props) => props.theme.main} ${props.widthInEm / 2}em);
+      top: calc(50% - ${props.widthInEm / 2}em);
       left: calc(50% - ${props.widthInEm / 2}em);
       width: ${props.widthInEm}em;
       transform: scaleX(${ (props.isReverse ? "-1" : "1")});
